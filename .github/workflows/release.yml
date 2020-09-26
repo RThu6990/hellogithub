@@ -39,7 +39,7 @@ jobs:
           echo ::set-output name=ptag::$(git describe --abbrev=0 --tags)
       
       - name: Create changelog
-        run: git ithub_changelog_generator --add-sections '{"documentation":{"prefix":"**Documentation updates:**","labels":["documentation"]}}' --token ${{ secrets.MYGITHUB_TOKEN }}
+        run: github_changelog_generator --add-sections '{"documentation":{"prefix":"**Documentation updates:**","labels":["documentation"]}}' --token ${{ secrets.MYGITHUB_TOKEN }}
         
       - run: |
           tee < ./CHANGELOG.md
