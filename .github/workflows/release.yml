@@ -47,7 +47,7 @@ jobs:
           stripHeaders: true
         
       - run: |
-          tee < CHANGELOG.md
+          tee < ./CHANGELOG.md
         
       - name: Read changelog
         id: read-changelog
