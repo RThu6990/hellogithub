@@ -26,7 +26,7 @@ jobs:
       - name: Get Tag Name
         id: get_tag_name
         run: |
-          echo ::set-output name=ltag::$(mvn -q mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          echo ::set-output name=ltag::$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
       
       - name: Format Tag Name
         id: format_tag_name
@@ -53,7 +53,7 @@ jobs:
         id: read-changelog
         uses: juliangruber/read-file-action@v1
         with:
-          path: CHANGELOG.md
+          path: ./CHANGELOG.md
     
       - name: Create release
         uses: actions/create-release@v1
