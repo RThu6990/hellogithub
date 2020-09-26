@@ -26,7 +26,7 @@ jobs:
       - name: Get Tag Name
         id: get_tag_name
         run: |
-          echo ::set-output name=ltag::$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version)
+          echo ::set-output name=ltag::$(mvn -q mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
       
       - name: Format Tag Name
         id: format_tag_name
