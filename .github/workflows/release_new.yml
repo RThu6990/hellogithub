@@ -1,0 +1,84 @@
+name: Maven Package
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+    
+    - name: Change Release Version
+      run: mvn org.apache.maven.plugins:maven-release-plugin:3.0.0-M1:update-versions
+      
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+      
+    - name: Get Tag Name
+      id: get_tag_name
+      run: |
+        echo ::set-output name=ltag::$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version)
+      
+    - name: Format Tag Name
+      id: format_tag_name
+      run: |
+        echo ::set-output name=ftag::$(${{ steps.get_tag_name.outputs.ltag }} | cut -d'-' -f 1)
+        
+    - name: Get Previous Tag Name
+      id: get_previous_tag_name
+      run: |
+        echo ::set-output name=ptag::$(git describe --abbrev=0 --tags)
+      
+    - run: git config user.name "GitHub Actions" && git config user.email "actions@github.com"
+    - run: git status
+    - run: git add pom.xml
+    - run: git commit -m "build: Updated pom.xml with new version number"
+    - run: git fetch origin master
+    - run: git push origin HEAD:master
+      
+    - name: Create changelog
+      uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        unreleased: true
+        addSections: '{"development":{"prefix":"**Dev Section updates:**","labels":["development"]}}'
+        futureRelease: ${{ steps.format-tag-name.outputs.ftag }}
+        sinceTag: ${{ steps.get-previous-tag-name.outputs.ptag }}
+        stripGeneratorNotice: true
+        stripHeaders: true
+        
+    - name: Read changelog
+      id: read-changelog
+      uses: juliangruber/read-file-action@v1
+        with:
+          path: $GITHUB_WORKSPACE/CHANGELOG.md
+    
+    - name: Create release
+      uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.format_tag_name.outputs.ftag }}
+          release_name: v${{ steps.format_tag_name.outputs.ftag }}
+          draft: false
+          prerelease: false
+          body: |
+            # hellogithub
+            ## Changes
+            ${{ steps.read-changelog.outputs.content }}
+    
+    - run: git config user.name "GitHub Actions" && git config user.email "actions@github.com"
+    - run: git status
+    - run: git add pom.xml
+    - run: git commit -m "build: Updated pom.xml with new version number"
+    - run: git fetch origin master
+    - run: git push origin HEAD:master
