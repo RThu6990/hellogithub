@@ -42,12 +42,12 @@ jobs:
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          unreleased: true
           addSections: '{"development":{"prefix":"**Dev Section updates:**","labels":["development"]}}'
-          futureRelease: ${{ steps.format-tag-name.outputs.ftag }}
-          sinceTag: ${{ steps.get-previous-tag-name.outputs.ptag }}
           stripGeneratorNotice: true
           stripHeaders: true
+        
+      - run: |
+          tee < CHANGELOG.md
         
       - name: Read changelog
         id: read-changelog
