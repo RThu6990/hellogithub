@@ -1,4 +1,4 @@
-name: Maven Package
+name: Release
 
 on: 
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
       - name: Format Tag Name
         id: format_tag_name
         run: |
-          echo ::set-output name=ftag::$(${{ steps.get_tag_name.outputs.ltag }} | cut -d'-' -f 1)
+          echo ::set-output name=ftag::$(echo ${{ steps.get_tag_name.outputs.ltag }} | cut -d'-' -f 1 )
         
       - name: Get Previous Tag Name
         id: get_previous_tag_name
