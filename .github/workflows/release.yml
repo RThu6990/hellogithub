@@ -39,7 +39,17 @@ jobs:
           echo ::set-output name=ptag::$(git describe --abbrev=0 --tags)
       
       - name: Create changelog
-        run: github_changelog_generator --add-sections '{"documentation":{"prefix":"**Documentation updates:**","labels":["documentation"]}}' --token ${{ secrets.MYGITHUB_TOKEN }}
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+        with:
+          token: ${{ secrets.MYGITHUB_TOKEN }}
+          unreleased: true
+          issues: true
+          issuesWoLabels: true
+          pullRequests: true
+          prWoLabels: true
+          filterByMilestone: false
+          stripGeneratorNotice: true
+          stripHeaders: true
         
       - run: |
           tee < ./CHANGELOG.md
