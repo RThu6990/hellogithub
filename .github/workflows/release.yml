@@ -47,6 +47,7 @@ jobs:
           token: ${{ secrets.MYGITHUB_TOKEN }}
           sinceTag: ${{ steps.get_previous_tag_name.outputs.ptag }}
           excludeLabels: 'development' 
+          output: temp_changelog.md
           unreleased: true
           issues: true
           issuesWoLabels: true
@@ -57,13 +58,13 @@ jobs:
           stripHeaders: true
         
       - run: |
-          tee < ./CHANGELOG.md
+          tee < ./temp_changelog.md
         
       - name: Read changelog
         id: read-changelog
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./CHANGELOG.md
+          path: ./temp_changelog.md
     
       - name: Create release
         uses: actions/create-release@v1
@@ -77,10 +78,15 @@ jobs:
           body: |
             ## Changes
             ${{ steps.read-changelog.outputs.content }}
+            
+      - run: |
+          echo "#hellogithub-v${{ steps.format_tag_name.outputs.ftag }}" >> CHANGELOG.md
+          echo "##Changes" >> CHANGELOG.md
+          echo "${{ steps.read-changelog.outputs.content }}" >> CHANGELOG.md
     
       - run: git config user.name "GitHub Actions" && git config user.email "actions@github.com"
       - run: git status
-      - run: git add pom.xml
-      - run: git commit -m "build:Updated pom.xml with new version number"
+      - run: git add pom.xml CHANGELOG.md
+      - run: git commit -m "Updated pom.xml and CHANGELOG.md for new version"
       - run: git fetch origin master
       - run: git push origin HEAD:master
