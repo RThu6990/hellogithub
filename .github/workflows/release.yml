@@ -37,11 +37,16 @@ jobs:
         id: get_previous_tag_name
         run: |
           echo ::set-output name=ptag::$(git describe --abbrev=0 --tags)
+          
+      - run: |
+          echo "Previous Tag = ${{ steps.get_previous_tag_name.outputs.ptag }}"
       
       - name: Create changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.MYGITHUB_TOKEN }}
+          sinceTag: ${{ steps.get_previous_tag_name }}
+          excludeLabels: 'development' 
           unreleased: true
           issues: true
           issuesWoLabels: true
@@ -70,7 +75,6 @@ jobs:
           draft: false
           prerelease: false
           body: |
-            # hellogithub
             ## Changes
             ${{ steps.read-changelog.outputs.content }}
     
