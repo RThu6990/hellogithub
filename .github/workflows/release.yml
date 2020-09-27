@@ -111,3 +111,8 @@ jobs:
       - run: git commit -m "Updated pom.xml and CHANGELOG.md for new version"
       - run: git fetch origin master
       - run: git push origin HEAD:master
+      
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
