@@ -52,7 +52,7 @@ jobs:
         with:
           filename: hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.zip
           path: ./staging
-          workingDirectory: ./staging
+          directory: ./staging
       
       - name: Create changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
