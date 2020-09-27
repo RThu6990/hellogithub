@@ -11,6 +11,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+		with:
+		  fetch-depth: 0
+	
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
@@ -114,8 +117,8 @@ jobs:
       - run: git status
       - run: git add pom.xml CHANGELOG.md
       - run: git commit -m "Updated pom.xml and CHANGELOG.md for new version"
-      - run: git fetch origin master
-      - run: git push origin HEAD:master
+      - run: git fetch --all origin
+      - run: git push --all origin
       
       - name: Publish to GitHub Packages Apache Maven
         run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
