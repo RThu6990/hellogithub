@@ -45,13 +45,15 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
         
-      - run: mkdir staging && cp ./target/*.jar staging
-      
+      - name: Rename jar file
+        run: |
+          mv ./target/hellogithub-${{ steps.format_tag_name.outputs.ftag }}-SNAPSHOT.jar ./target/hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.jar
+        
       - name: Archive Release
         uses: papeloto/action-zip@v1
         with:
-          files: staging/*.*
-          dest: staging/hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.zip
+          files: ./target/hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.jar
+          dest: ./target/hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.zip
       
       - name: Create changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
@@ -98,7 +100,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./staging/hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.zip
+          asset_path: ./target/hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.zip
           asset_name: hellogithub-v${{ steps.format_tag_name.outputs.ftag }}.zip
           asset_content_type: application/zip
             
@@ -111,8 +113,8 @@ jobs:
       - run: git status
       - run: git add pom.xml CHANGELOG.md
       - run: git commit -m "Updated pom.xml and CHANGELOG.md for new version"
-      - run: git fetch --all origin
-      - run: git push --all origin
+      - run: git fetch origin release
+      - run: git push origin HEAD:release
       
       - name: Publish to GitHub Packages Apache Maven
         run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
