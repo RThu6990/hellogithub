@@ -45,7 +45,7 @@ jobs:
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.MYGITHUB_TOKEN }}
-          sinceTag: ${{ steps.get_previous_tag_name }}
+          sinceTag: ${{ steps.get_previous_tag_name.outputs.ptag }}
           excludeLabels: 'development' 
           unreleased: true
           issues: true
